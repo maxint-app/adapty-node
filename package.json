@@ -1,0 +1,28 @@
+{
+	"name": "adapty-node",
+	"version": "0.1.0",
+	"description": "",
+	"main": "./dist/esm/index.js",
+	"exports": {
+		".": {
+			"import": "./dist/esm/index.js"
+		}
+	},
+	"type": "module",
+	"scripts": {
+		"build": "tsc",
+		"lint": "@biomejs/biome lint",
+		"format": "@biomejs/biome format"
+	},
+	"keywords": [],
+	"author": "Maxint Inc.",
+	"license": "MIT",
+	"devDependencies": {
+		"@biomejs/biome": "1.8.3",
+		"@types/node": "^22.3.0",
+		"typescript": "^5.5.4"
+	},
+	"dependencies": {
+		"axios": "^1.7.4"
+	}
+}
