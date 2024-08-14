@@ -42,9 +42,15 @@ export class ProfileEndpoint extends Endpoint {
 		return data;
 	}
 
-	async create(customUserId: string): Promise<AdaptyProfileResponse> {
+	async create(
+		customUserId: string,
+		attributes?: AdaptyUserAttributesUpdateRequest,
+	): Promise<AdaptyProfileResponse> {
 		const response = await this.axios.post("/profiles", {
 			customer_user_id: customUserId,
+			...objectKeysCamelCaseToSnakeCase(
+				objectRemoveUndefined(attributes ?? {}),
+			),
 		});
 
 		const data = objectKeysSnakeCaseToCamelCase(

@@ -12,6 +12,7 @@ export class AdaptyClient {
 			headers: {
 				Authorization: `Api-Key ${token}`,
 				"Content-Type": "application/json",
+        Accept: "application/json",
 			},
 			validateStatus(status) {
 				return status >= 200 && status < 400;

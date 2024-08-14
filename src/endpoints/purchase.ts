@@ -16,7 +16,10 @@ export class PurchaseEndpoint extends Endpoint {
 				},
 			},
 			{
-				headers: { "Content-Type": "application/vnd.api+json" },
+				headers: {
+					"Content-Type": "application/vnd.api+json",
+					Accept: "*/*",
+				},
 			},
 		);
 	}
