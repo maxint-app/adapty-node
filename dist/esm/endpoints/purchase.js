@@ -1,8 +1,8 @@
-import { objectKeysCamelCaseToSnakeCase } from "../utils/object.js";
+import { snakifyObject } from "../utils/object.js";
 import Endpoint from "./endpoint.js";
 export class PurchaseEndpoint extends Endpoint {
     async validate(body) {
-        const snakeCaseBody = objectKeysCamelCaseToSnakeCase(body);
+        const snakeCaseBody = snakifyObject(body);
         await this.axios.post("/purchase/stripe/token/validate/", {
             data: {
                 type: "stripe_receipt_validation_result",

@@ -1,5 +1,3 @@
-import type { AdaptyCustomerAccessLevel } from "../models/access_level.js";
-import type { AdaptyNonSubscription } from "../models/non_subscription.js";
 import type {
 	AdaptyProfileAccessLevelGrantRequestOptions,
 	AdaptyProfileResponse,
@@ -7,52 +5,15 @@ import type {
 	AdaptyProfileExtendedResponse,
 	AdaptyUserAttributesUpdateRequest,
 } from "../models/profile.js";
-import type { AdaptySubscription } from "../models/subscription.js";
-import type { KeysToSnakeCase } from "../utils/object.js";
 import {
-	objectKeysCamelCaseToSnakeCase,
-	objectKeysSnakeCaseToCamelCase,
+	camelizeObject,
 	objectRemoveUndefined,
 	objectRemoveUndefinedOrNull,
+  snakifyObject,
 } from "../utils/object.js";
 import Endpoint from "./endpoint.js";
 
 export class ProfileEndpoint extends Endpoint {
-	#profileObjectSnakeCaseToCameCase(
-		profile:
-			| KeysToSnakeCase<AdaptyProfileResponse>
-			| KeysToSnakeCase<AdaptyProfileExtendedResponse>,
-	): AdaptyProfileResponse | AdaptyProfileExtendedResponse {
-		return {
-			...objectKeysSnakeCaseToCamelCase(profile),
-
-			subscriptions: !profile.subscriptions
-				? null
-				: (Object.fromEntries(
-						Object.entries(profile.subscriptions).map(([key, value]) => [
-							key,
-							objectKeysSnakeCaseToCamelCase(value),
-						]),
-					) as unknown as Record<string, AdaptySubscription>),
-			nonSubscriptions: !profile.non_subscriptions
-				? null
-				: (Object.fromEntries(
-						Object.entries(profile.non_subscriptions).map(([key, value]) => [
-							key,
-							objectKeysSnakeCaseToCamelCase(value),
-						]),
-					) as unknown as Record<string, AdaptyNonSubscription>),
-			paidAccessLevels: !profile.paid_access_levels
-				? null
-				: (Object.fromEntries(
-						Object.entries(profile.paid_access_levels).map(([key, value]) => [
-							key,
-							objectKeysSnakeCaseToCamelCase(value),
-						]),
-					) as unknown as Record<string, AdaptyCustomerAccessLevel>),
-		};
-	}
-
 	async get(
 		id: string,
 		config = { extended: false },
@@ -61,7 +22,9 @@ export class ProfileEndpoint extends Endpoint {
 			`/profiles/${id}/${config.extended ? "?extended=true" : ""}`,
 		);
 
-		const data = this.#profileObjectSnakeCaseToCameCase(response.data.data);
+		const data = camelizeObject(response.data.data) as unknown as
+			| AdaptyProfileResponse
+			| AdaptyProfileExtendedResponse;
 
 		return data;
 	}
@@ -72,14 +35,14 @@ export class ProfileEndpoint extends Endpoint {
 	): Promise<AdaptyProfileResponse> {
 		const response = await this.axios.post("/profiles/", {
 			customer_user_id: customUserId,
-			...objectKeysCamelCaseToSnakeCase(
-				objectRemoveUndefined(attributes ?? {}),
+			...snakifyObject(
+				objectRemoveUndefined(attributes ?? {}) as Record<string, unknown>,
 			),
 		});
 
-		const data = this.#profileObjectSnakeCaseToCameCase(
-			response.data.data as KeysToSnakeCase<AdaptyProfileResponse>,
-		);
+		const data = camelizeObject(
+			response.data.data,
+		) as unknown as AdaptyProfileResponse;
 
 		return data;
 	}
@@ -92,12 +55,12 @@ export class ProfileEndpoint extends Endpoint {
 	} & AdaptyUserAttributesUpdateRequest): Promise<AdaptyProfileResponse> {
 		const response = await this.axios.patch(
 			`/profiles/${id}/`,
-			objectKeysCamelCaseToSnakeCase(objectRemoveUndefined(body)),
+			snakifyObject(objectRemoveUndefined(body)),
 		);
 
-		const data = this.#profileObjectSnakeCaseToCameCase(
-			response.data.data as KeysToSnakeCase<AdaptyProfileResponse>,
-		);
+		const data = camelizeObject(
+			response.data.data,
+		) as unknown as AdaptyProfileResponse;
 
 		return data;
 	}
@@ -111,7 +74,7 @@ export class ProfileEndpoint extends Endpoint {
 		id,
 		...body
 	}: AdaptyProfileAccessLevelGrantRequestOptions): Promise<AdaptyProfileResponse> {
-		const snakeCaseBody = objectKeysCamelCaseToSnakeCase(
+		const snakeCaseBody = snakifyObject(
 			objectRemoveUndefinedOrNull(body),
 		);
 		const response = await this.axios.post(
@@ -119,9 +82,9 @@ export class ProfileEndpoint extends Endpoint {
 			snakeCaseBody,
 		);
 
-		const data = this.#profileObjectSnakeCaseToCameCase(
-			response.data.data as KeysToSnakeCase<AdaptyProfileResponse>,
-		);
+		const data = camelizeObject(
+			response.data.data,
+		) as unknown as AdaptyProfileResponse;
 
 		return data;
 	}
@@ -131,7 +94,7 @@ export class ProfileEndpoint extends Endpoint {
 		id,
 		...body
 	}: AdaptyProfileAccessLevelRevokeRequestOptions): Promise<void> {
-		const snakeCaseBody = objectKeysCamelCaseToSnakeCase(
+		const snakeCaseBody = snakifyObject(
 			objectRemoveUndefinedOrNull(body),
 		);
 		await this.axios.post(

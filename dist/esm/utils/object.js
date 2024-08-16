@@ -1,27 +1,4 @@
-export function camelCaseToSnakeCase(str) {
-    return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
-}
-export function snakeCaseToCamelCase(str) {
-    return str
-        .toLowerCase()
-        .replace(/([-_][a-z])/g, (group) => group.toUpperCase().replace("-", "").replace("_", ""));
-}
-export function objectKeysCamelCaseToSnakeCase(obj) {
-    const newObj = {};
-    for (const key in obj) {
-        const newKey = camelCaseToSnakeCase(key);
-        newObj[newKey] = obj[key];
-    }
-    return newObj;
-}
-export function objectKeysSnakeCaseToCamelCase(obj) {
-    const newObj = {};
-    for (const key in obj) {
-        const newKey = snakeCaseToCamelCase(key);
-        newObj[newKey] = obj[key];
-    }
-    return newObj;
-}
+import { camelCase, isArray, transform, isObject, snakeCase } from "lodash-es";
 export function objectRemoveUndefined(obj) {
     const newObj = {};
     for (const key in obj) {
@@ -39,5 +16,21 @@ export function objectRemoveUndefinedOrNull(obj) {
         newObj[key] = obj[key];
     }
     return newObj;
+}
+export function camelizeObject(obj) {
+    return transform(obj, (result, value, key, target) => {
+        const camelKey = isArray(target) ? key : camelCase(key);
+        result[camelKey] = isObject(value)
+            ? camelizeObject(value)
+            : value;
+    });
+}
+export function snakifyObject(obj) {
+    return transform(obj, (result, value, key, target) => {
+        const camelKey = isArray(target) ? key : snakeCase(key);
+        result[camelKey] = isObject(value)
+            ? snakifyObject(value)
+            : value;
+    });
 }
 //# sourceMappingURL=object.js.map

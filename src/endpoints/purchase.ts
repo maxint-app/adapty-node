@@ -1,4 +1,4 @@
-import { objectKeysCamelCaseToSnakeCase } from "../utils/object.js";
+import { snakifyObject } from "../utils/object.js";
 import Endpoint from "./endpoint.js";
 
 export class PurchaseEndpoint extends Endpoint {
@@ -6,7 +6,7 @@ export class PurchaseEndpoint extends Endpoint {
 		customerUserId: string;
 		stripeToken: string;
 	}): Promise<void> {
-		const snakeCaseBody = objectKeysCamelCaseToSnakeCase(body);
+		const snakeCaseBody = snakifyObject(body);
 		await this.axios.post(
 			"/purchase/stripe/token/validate/",
 			{
