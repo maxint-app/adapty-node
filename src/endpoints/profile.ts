@@ -1,3 +1,5 @@
+import type { AdaptyCustomerAccessLevel } from "../models/access_level.js";
+import type { AdaptyNonSubscription } from "../models/non_subscription.js";
 import type {
 	AdaptyProfileAccessLevelGrantRequestOptions,
 	AdaptyProfileResponse,
@@ -5,6 +7,7 @@ import type {
 	AdaptyProfileExtendedResponse,
 	AdaptyUserAttributesUpdateRequest,
 } from "../models/profile.js";
+import type { AdaptySubscription } from "../models/subscription.js";
 import type { KeysToSnakeCase } from "../utils/object.js";
 import {
 	objectKeysCamelCaseToSnakeCase,
@@ -15,29 +18,50 @@ import {
 import Endpoint from "./endpoint.js";
 
 export class ProfileEndpoint extends Endpoint {
-	async get(
-		id: string,
-		config: { extended: true },
-	): Promise<AdaptyProfileExtendedResponse>;
+	#profileObjectSnakeCaseToCameCase(
+		profile:
+			| KeysToSnakeCase<AdaptyProfileResponse>
+			| KeysToSnakeCase<AdaptyProfileExtendedResponse>,
+	): AdaptyProfileResponse | AdaptyProfileExtendedResponse {
+		return {
+			...objectKeysSnakeCaseToCamelCase(profile),
+
+			subscriptions: !profile.subscriptions
+				? null
+				: (Object.fromEntries(
+						Object.entries(profile.subscriptions).map(([key, value]) => [
+							key,
+							objectKeysSnakeCaseToCamelCase(value),
+						]),
+					) as unknown as Record<string, AdaptySubscription>),
+			nonSubscriptions: !profile.non_subscriptions
+				? null
+				: (Object.fromEntries(
+						Object.entries(profile.non_subscriptions).map(([key, value]) => [
+							key,
+							objectKeysSnakeCaseToCamelCase(value),
+						]),
+					) as unknown as Record<string, AdaptyNonSubscription>),
+			paidAccessLevels: !profile.paid_access_levels
+				? null
+				: (Object.fromEntries(
+						Object.entries(profile.paid_access_levels).map(([key, value]) => [
+							key,
+							objectKeysSnakeCaseToCamelCase(value),
+						]),
+					) as unknown as Record<string, AdaptyCustomerAccessLevel>),
+		};
+	}
+
 	async get(
 		id: string,
 		config = { extended: false },
-	): Promise<AdaptyProfileResponse> {
+	): Promise<AdaptyProfileResponse | AdaptyProfileExtendedResponse> {
 		const response = await this.axios.get(
 			`/profiles/${id}/${config.extended ? "?extended=true" : ""}`,
 		);
 
-		if (config.extended) {
-			const data = objectKeysSnakeCaseToCamelCase(
-				response.data.data as KeysToSnakeCase<AdaptyProfileExtendedResponse>,
-			);
-
-			return data;
-		}
-
-		const data = objectKeysSnakeCaseToCamelCase(
-			response.data.data as KeysToSnakeCase<AdaptyProfileResponse>,
-		);
+		const data = this.#profileObjectSnakeCaseToCameCase(response.data.data);
 
 		return data;
 	}
@@ -53,7 +77,7 @@ export class ProfileEndpoint extends Endpoint {
 			),
 		});
 
-		const data = objectKeysSnakeCaseToCamelCase(
+		const data = this.#profileObjectSnakeCaseToCameCase(
 			response.data.data as KeysToSnakeCase<AdaptyProfileResponse>,
 		);
 
@@ -71,7 +95,7 @@ export class ProfileEndpoint extends Endpoint {
 			objectKeysCamelCaseToSnakeCase(objectRemoveUndefined(body)),
 		);
 
-		const data = objectKeysSnakeCaseToCamelCase(
+		const data = this.#profileObjectSnakeCaseToCameCase(
 			response.data.data as KeysToSnakeCase<AdaptyProfileResponse>,
 		);
 
@@ -95,7 +119,7 @@ export class ProfileEndpoint extends Endpoint {
 			snakeCaseBody,
 		);
 
-		const data = objectKeysSnakeCaseToCamelCase(
+		const data = this.#profileObjectSnakeCaseToCameCase(
 			response.data.data as KeysToSnakeCase<AdaptyProfileResponse>,
 		);
 
