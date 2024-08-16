@@ -24,7 +24,7 @@ export class ProfileEndpoint extends Endpoint {
 		config = { extended: false },
 	): Promise<AdaptyProfileResponse> {
 		const response = await this.axios.get(
-			`/profiles/${id}${config.extended ? "?extended=true" : ""}`,
+			`/profiles/${id}/${config.extended ? "?extended=true" : ""}`,
 		);
 
 		if (config.extended) {
@@ -46,7 +46,7 @@ export class ProfileEndpoint extends Endpoint {
 		customUserId: string,
 		attributes?: AdaptyUserAttributesUpdateRequest,
 	): Promise<AdaptyProfileResponse> {
-		const response = await this.axios.post("/profiles", {
+		const response = await this.axios.post("/profiles/", {
 			customer_user_id: customUserId,
 			...objectKeysCamelCaseToSnakeCase(
 				objectRemoveUndefined(attributes ?? {}),
@@ -67,7 +67,7 @@ export class ProfileEndpoint extends Endpoint {
 		id: string;
 	} & AdaptyUserAttributesUpdateRequest): Promise<AdaptyProfileResponse> {
 		const response = await this.axios.patch(
-			`/profiles/${id}`,
+			`/profiles/${id}/`,
 			objectKeysCamelCaseToSnakeCase(objectRemoveUndefined(body)),
 		);
 
@@ -91,7 +91,7 @@ export class ProfileEndpoint extends Endpoint {
 			objectRemoveUndefinedOrNull(body),
 		);
 		const response = await this.axios.post(
-			`/profiles/${id}/paid-access-levels/${accessLevel}/grant`,
+			`/profiles/${id}/paid-access-levels/${accessLevel}/grant/`,
 			snakeCaseBody,
 		);
 
@@ -111,7 +111,7 @@ export class ProfileEndpoint extends Endpoint {
 			objectRemoveUndefinedOrNull(body),
 		);
 		await this.axios.post(
-			`/profiles/${id}/paid-access-levels/${accessLevel}/revoke`,
+			`/profiles/${id}/paid-access-levels/${accessLevel}/revoke/`,
 			snakeCaseBody,
 		);
 	}
