@@ -9,7 +9,7 @@ export interface AdaptyCustomerAccessLevel {
 	startsAt: string | null;
 	vendorProductId: string | null;
 	basePlainId: string | null;
-	store: "app_store" | "play_store" | "adapty" | null;
+	store: "app_store" | "play_store" | "adapty" | "stripe" | null;
 	renewedAt: string | null;
 	unsubscribedAt: string | null;
 	billingIssueDetectedAt: string | null;

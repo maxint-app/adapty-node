@@ -11,10 +11,10 @@ export interface AdaptySubscription {
     basePlanId: string | null;
     vendorTransactionId: string | null;
     vendorOriginalTransactionId: string | null;
-    store: "app_store" | "play_store" | "adapty" | null;
+    store: "app_store" | "play_store" | "adapty" | "stripe" | null;
     renewedAt: string | null;
     unsubscribedAt: string | null;
     billingIssueDetectedAt: string | null;
-    activeIntroductoryOfferType: 'free_trial' | 'pay_as_you_go' | 'pay_up_front' | null;
-    activePromotionalOfferType: 'free_trial' | 'pay_as_you_go' | 'pay_up_front' | null;
+    activeIntroductoryOfferType: "free_trial" | "pay_as_you_go" | "pay_up_front" | null;
+    activePromotionalOfferType: "free_trial" | "pay_as_you_go" | "pay_up_front" | null;
 }

@@ -6,5 +6,5 @@ export interface AdaptyNonSubscription {
     vendorProductId: string | null;
     vendorTransactionId: string | null;
     vendorOriginalTransactionId: string | null;
-    store: "app_store" | "play_store" | "adapty" | null;
+    store: "app_store" | "play_store" | "adapty" | "stripe" | null;
 }
